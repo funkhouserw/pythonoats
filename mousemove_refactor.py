@@ -50,15 +50,16 @@ def change_command_to_radius(cmd,coords):
       return "m.release("+str(x_val)+","+str(y_val)+",1)"
 
 def run_commands(commands,release=True):
+  wait = 0.03
   if release:
     last_x,last_y = commands[-1][1]
     commands.append(("m.release("+str(last_x)+","+str(last_y)+",1)",(last_x,last_y)))
   for (command,coords) in commands:
     if(is_in_circle(coords)[0]):
-      time.sleep(0.03)
+      time.sleep(wait)
       eval(command)
     else:
-      time.sleep(0.03)
+      time.sleep(wait)
       eval(change_command_to_radius(command,coords))
 
 def PointsInCircum(r,n=100,xskew=1,yskew=1):
@@ -95,11 +96,12 @@ def square(x,y,side):
   return commands
 
 def square_slope(x,y,side,slope):
+  draw_all_points = False
   points_raw = [(x,y),(x+side,y+side*slope),(x+side,y+side+side*slope),(x,y+side),(x,y),(x+side,y+side*slope)]
   points = [(int(a),int(b)) for (a,b) in points_raw]
   commands = [("m.press("+str(x)+","+str(y)+"),1",(x,y))]
   for my_x,my_y in points:
-    if random.random() > 0.4 :
+    if random.random() > 0.4 or draw_all_points:
       commands.append(("m.press("+str(my_x)+","+str(my_y)+"),1",(my_x,my_y)))
   return commands
 
@@ -113,10 +115,8 @@ def percent_of_cmds(commands,start_pct,step_pct):
   commands = commands[:min(int(step_pct*len(commands)),len(commands))]
   return commands
 
-
-
-
 def square_grid(sx,sy,slope,side,space,yrepeat,mainrepeat,goleft=False):
+  draw_all_points = False
   for x in range(0,yrepeat,1):
     x_start = sx
     y_start = sy + int((side+space)*x)
@@ -129,20 +129,8 @@ def square_grid(sx,sy,slope,side,space,yrepeat,mainrepeat,goleft=False):
         addy = int(i*(side+space)*slope)
       nx_start = x_start + addx 
       ny_start = y_start + addy 
-      if random.random() > 0.75 or True:
+      if random.random() > 0.75 or draw_all_points:
           run_commands(square_slope(nx_start,ny_start,side,slope),True)
-
-#run_commands(square(center[0]+200,center[1]-100,50),True)
-#run_commands(square_slope(center[0]+200,center[1]-100,50,-0.5),True)
-#square_grid(fs_center[0]+150,fs_center[1]-250,0,20,5,5,15,False)
-#square_grid(center[0]+320,center[1]-250,-1/3,20,5,5,10,True)
-#square_grid(center[0]-320,center[1]-250,0,20,4,19,25,False)
-#######################
-#square_grid(left_up[0]-40,center[1]-260,0,25,10,14,27,False)
-#bottom = center[1]-260 + (25+10)*14
-#square_grid(left_up[0]-80,top,0,10,5,10,65)
-#square_grid(left_up[0]-80,bottom,0,10,5,10,55)
-################
 
 def square_changes():
   screen_width = right_up[0] - left_up[0] 
@@ -161,39 +149,20 @@ def square_changes():
     square_grid(left_up[0]-80,last_top,0,width,space,y_loop,number_of_repeats) 
     last_top = last_top + (space + width)*y_loop
     
-#square_changes()
-#square_grid(center[0],center[1]-250,0,30,10,1,12,False)
 
-
-#for i in range(1,11,1):
-#  x_start = left_up[0]+100
-#  y_start = left_up[1]-100
-#  y_shift = i*20
-#  x_distance = 10
-#  n = 20
-#  rightmost_x = x_start + n*x_distance
-#  if i%2 == 1:
-#    run_commands(squiggles(x_start,y_start+y_shift,y_start+35+y_shift,x_distance,n),False)
-#  else:
-#    run_commands(squiggles(rightmost_x,y_start+y_shift,y_start+35+y_shift,x_distance*-1,n),True)
-
-
-###### PARABOLASSSS
-#for z in range(0,1,1):
-#  add_x = 20*z
-#  for n in range(0,15,1):
-#    commands = []
-#    x_start = left_up[0]+100 + add_x
-#    y_start = left_up[1]-100 + 10*n
-#    for i in range(-10,10,1):
-#      x = x_start+5*int(i) 
-#      y = y_start+int((1+(abs(i)/10))*(i**2))
-#      print(x,y)
-#      commands.append(("m.press("+str(x)+","+str(y)+")",(x,y)))
-#    run_commands(commands,False)
-
-
-
+def parabolas():
+  for z in range(0,1,1):
+    add_x = 20*z
+    for n in range(0,15,1):
+      commands = []
+      x_start = left_up[0]+100 + add_x
+      y_start = left_up[1]-100 + 10*n
+      for i in range(-10,10,1):
+        x = x_start+5*int(i) 
+        y = y_start+int((1+(abs(i)/10))*(i**2))
+        print(x,y)
+        commands.append(("m.press("+str(x)+","+str(y)+")",(x,y)))
+      run_commands(commands,False)
 
 def random():
   max_range = 200
@@ -229,14 +198,6 @@ def hemispheres():
         #newy=commands[-1][-1][1]
       run_commands(commands,True)
 
-#max_range = 220
-#for i in range(150,max_range,15):
-#  percent_start = max(i/max_range,1-0.14)
-#  percent_end = max(i/max_range + 0.14,1)
-#  run_commands(draw_circle(center[0],center[1],i,100,xskew=1,yskew=1,percent_draw_start=percent_start,percent_draw_end=percent_end),i==160)
-
-#angles are always 60
-#length is always side / iteration
 
 def triangle_from_points(points):
   sx,sy = points[0]
@@ -282,9 +243,6 @@ def serpinski(data,steps,k):
     if random.random() > cutoff: 
       serpinski([sp[2],midpoints[1],midpoints[2]],steps,k)
 
-## FULL SCREEN ONLY
-#serpinski(triangle(center[0]-120,center[1]+160,1050,True),5,0)
-#serpinski(triangle(center[0]+120,center[1]-200,750),5,0)
 
 def random_triangles():
   #angle = math.radians(random.random()*360)
@@ -302,12 +260,98 @@ def random_triangles():
     upsidedown = not upsidedown
   serpinski(triangle(x_point,y_point,triangle_size,upsidedown),depth,0)
 
-#for _ in range(0,12):
-#  random_triangles()
-
 
 #serpinski(triangle(center[0],center[1]-430,900),6,0)
 #serpinski(triangle(center[0]-260,center[1]-50,700),5,0)
 
+def cad(back_square,front_square):
+    sides = []
+    for i in range(0,len(back_square)):
+        r = (i+1)%4
+        #sides.append((back_square[i],front_square[i],front_square[r],back_square[r],back_square[i],back_square[i]))
+        sides.append((back_square[i],front_square[i],front_square[r],back_square[r]))
+    for side in sides:
+        commands = []
+        commands.append(("m.press("+str(side[0][0])+","+str(side[0][1])+"),1",(side[0][0],side[0][1])))
 
-#serpinski(triangle(center[0]+320,center[1]+160,550,True),4,0)
+        for (my_x,my_y) in side:
+            commands.append(("m.press("+str(my_x)+","+str(my_y)+"),1",(my_x,my_y)))
+
+        for (my_x,my_y) in side:
+            commands.append(("m.press("+str(my_x)+","+str(my_y)+"),1",(my_x,my_y)))
+
+        run_commands(commands,True)
+
+def run_squares(xshift=-300,yshift=300,xshift2=0,yshift2=0):
+    square1_vertex = (fs_center[0]+xshift2,fs_center[1]+yshift2)
+    #starting_size = random.randrange(10,40,5)
+    starting_size = 30
+    back_square = [
+            (square1_vertex[0],square1_vertex[1]),
+            (square1_vertex[0]+starting_size,square1_vertex[1]),
+            (square1_vertex[0]+starting_size,square1_vertex[1]+starting_size),
+            (square1_vertex[0],square1_vertex[1]+starting_size),
+            ]
+
+    square2_vertex = (fs_center[0]+xshift,fs_center[1]+yshift)
+    #ending_size = random.randrange(60,120,20)
+    ending_size = 80
+    front_square = [
+            (square2_vertex[0],square2_vertex[1]),
+            (square2_vertex[0]+ending_size,square2_vertex[1]),
+            (square2_vertex[0]+ending_size,square2_vertex[1]+ending_size),
+            (square2_vertex[0],square2_vertex[1]+ending_size),
+            ]
+
+    lines = []
+    for i in range(0,len(back_square)):
+        slope = (back_square[i][1]-front_square[i][1])/(back_square[i][0]-front_square[i][0])
+        length = math.hypot(back_square[i][1]-front_square[i][1],back_square[i][0]-front_square[i][0])
+        x_length= back_square[i][0]-front_square[i][0]
+        lines.append([slope,length,x_length])
+
+    steps = 3
+    abs_dist = lines[0][-1]
+    abs_change = ending_size - starting_size
+    for line in lines:
+        relative_distance = line[-1]/abs_dist
+        line.append(relative_distance)
+    for i in range(0,steps,1):
+        coords = []
+        for r in range(0,len(lines)):
+            line = lines[r]
+            x_change = line[-1]*abs_dist*i/steps
+            y_change = x_change * line[0]
+            x_full = int(front_square[r][0] + x_change)
+            y_full = int(front_square[r][1] + y_change)
+            coords.append((x_full,y_full))
+        cad(back_square,coords)
+    cad(back_square,front_square)
+
+def multiple_squares():
+    #sqrs = [(-250,250,-150,150),(-150,300,150,150),(-250,-50,-150,-150),(300,-250,150,-150),(10,30,0,0)]
+    sqrs = [(-150,400-int((8/3)*i),50,250-i) for i in range(0,170,30)]
+    for (a,b,c,d) in sqrs:
+        run_squares(a,b,c,d)
+
+
+def building():
+    square2_vertex = (fs_center[0]+200,fs_center[1]+100)
+    ending_size = 30
+    starting_size = 130
+
+    i = starting_size
+    vertex = square2_vertex
+    while i > ending_size:
+      run_commands(square_slope(vertex[0],vertex[1],i,-1*(starting_size-i)/(3*starting_size)),False)
+      i = i - 1
+      if i%2 == 0:
+        y_c = 1
+        x_c = 2
+      else:
+        y_c = 1
+        x_c = 1
+      vertex = (vertex[0]-x_c,vertex[1]-y_c) 
+
+
+multiple_squares()
