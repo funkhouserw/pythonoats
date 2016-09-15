@@ -3,6 +3,12 @@ python mouse-controller for myoats.com
 
 ## This needs a LOT of explaning.
 
+This is a python script that controls your mouse to procedurally generate
+designs on myoats.com 
+
+My portfolio is [here](http://www.myoats.com/users/Purejenius/designs)
+All designs in there were created with these functions. 
+
 
 ## Some Notable Functions / The basics
 
