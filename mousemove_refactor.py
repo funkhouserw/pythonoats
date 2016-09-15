@@ -226,10 +226,12 @@ def midpoint(tuple1,tuple2):
   x1,y1 = tuple1
   x2,y2 = tuple2
   return (int((x1 + x2)/2), int((y1 + y2)/2))
+
 import random
-def serpinski(data,steps,k):
+
+def serpinski(sps,steps,k):
   # get initial points
-  sp = data
+  sp = sps
   if random.random() > 0: # min(0.9,0.2*k): 
     triangle_from_points(sp)
   midpoints = [midpoint(sp[0],sp[1]),midpoint(sp[1],sp[2]),midpoint(sp[2],sp[0])]
