@@ -3,6 +3,10 @@ python mouse-controller for myoats.com
 
 ## Getting Started/ Basics
 
+### Step 0:  Install pymouse
+follow instructions and install: 
+[https://github.com/SavinaRoja/PyUserInput](https://github.com/SavinaRoja/PyUserInput)
+
 ### Figuring out your screen's coordinates.
 To start out with, we need to determine the coordinate system/etc of your
 screen. Here's how I did it (Ubuntu/Mac. YYMV with Windows.) 
