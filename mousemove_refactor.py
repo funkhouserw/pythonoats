@@ -1,11 +1,13 @@
 from pymouse import PyMouse
 import time
+import numpy as np
 import math
 import random
 
 
 ### Change these to the relevant coordinates of your screen! 
 ### I use "fullscreen" mode on myoats.com, giving more room for real estate. 
+m = PyMouse()
 fs_center = (800, 445)
 fs_left_up = (100, 100)
 fs_left_down = (100, 800)
@@ -50,7 +52,7 @@ def change_command_to_radius(cmd,coords):
       return "m.release("+str(x_val)+","+str(y_val)+",1)"
 
 def run_commands(commands,release=True):
-  wait = 0.03
+  wait = 0.08
   if release:
     last_x,last_y = commands[-1][1]
     commands.append(("m.release("+str(last_x)+","+str(last_y)+",1)",(last_x,last_y)))
@@ -96,7 +98,7 @@ def square(x,y,side):
   return commands
 
 def square_slope(x,y,side,slope):
-  draw_all_points = False
+  draw_all_points = True
   points_raw = [(x,y),(x+side,y+side*slope),(x+side,y+side+side*slope),(x,y+side),(x,y),(x+side,y+side*slope)]
   points = [(int(a),int(b)) for (a,b) in points_raw]
   commands = [("m.press("+str(x)+","+str(y)+"),1",(x,y))]
@@ -337,16 +339,16 @@ def multiple_squares():
         run_squares(a,b,c,d)
 
 
-def building():
-    square2_vertex = (fs_center[0]+200,fs_center[1]+100)
-    ending_size = 30
-    starting_size = 130
+def building(sx,sy,end,start,rate=1):
+    square2_vertex = (fs_center[0]+sx,fs_center[1]+sy)
+    ending_size = end
+    starting_size = start
 
     i = starting_size
     vertex = square2_vertex
     while i > ending_size:
       run_commands(square_slope(vertex[0],vertex[1],i,-1*(starting_size-i)/(3*starting_size)),False)
-      i = i - 1
+      i = int(i - 1*rate)
       if i%2 == 0:
         y_c = 1
         x_c = 2
@@ -356,4 +358,63 @@ def building():
       vertex = (vertex[0]-x_c,vertex[1]-y_c) 
 
 
-multiple_squares()
+
+
+def coords_wrt_origin(atuple,origin):
+    return (atuple[0]-origin[0],atuple[1]-origin[1])
+
+def coords_wrt_screen(atuple,origin):
+    return (int(atuple[0]+origin[0]),int(atuple[1]+origin[1]))
+
+def centeroidnp(arr):
+    length = len(arr)
+    sum_x = np.sum(x for (x,y) in arr)
+    sum_y = np.sum(y for (x,y) in arr)
+    return sum_x/length, sum_y/length
+
+
+def rotate(points, origin = fs_center, degrees = 90):
+    #relative points and relative origin
+    relative_coords = [coords_wrt_origin(point,origin) for point in points]
+    """ http://stackoverflow.com/questions/20023209/function-for-rotating-2d-objects  """
+    theta = math.radians(degrees)
+    rotatedPolygon = []
+    for corner in relative_coords :
+        rotatedPolygon.append(( corner[0]*math.cos(theta)-corner[1]*math.sin(theta) , corner[0]*math.sin(theta)+corner[1]*math.cos(theta)) )
+    return [coords_wrt_screen(point,origin) for point in rotatedPolygon]
+
+
+def rotated_building(sx,sy,end,start,decrementi = True, topcount=200):
+    square2_vertex = (fs_center[0]+sx,fs_center[1]+sy)
+    ending_size = end
+    starting_size = start
+    i = starting_size
+    vertex = square2_vertex
+    rotate_angle = 0
+    rotate_by = 2
+    hard_count = 0
+    while i > ending_size and hard_count < topcount:
+      if decrementi:
+        i = i - 1
+      hard_count = hard_count + 1 
+      coords = [b for (a,b) in square_slope(vertex[0],vertex[1],i,-1*(starting_size-i)/(3*starting_size))]
+      origin = centeroidnp(coords)
+      commands = []
+      for (x,y) in rotate(coords,origin,rotate_angle):
+        commands.append(("m.press("+str(x)+","+str(y)+"),1",(x,y)))
+      run_commands(commands,False)
+      if i%2 == 0:
+        y_c = 4
+        x_c = 5
+      else:
+        y_c = 5
+        x_c = 4
+      vertex = (vertex[0]-x_c,vertex[1]-y_c) 
+      rotate_angle = rotate_angle + rotate_by
+
+
+rotated_building(200,200,20,500,False,100)
+#multiple_squares()
+
+#building(200,100,100,130)
+#building(200-50,100-35,70,100,2)
