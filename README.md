@@ -3,6 +3,18 @@ python mouse-controller for myoats.com
 
 ## Getting Started/ Basics
 
+## WARNING:  this uses a python script to control your actual mouse. This means a few things.
+- You won't be able to do anything else while you are running a script.
+- If something goes wrong and you end up with...
+  - an infinite loop
+  - the mouse gets outside of the myoats window
+- ... then the mouse might go click/do things you don't want it to.
+- SO MAKE SURE YOU UNDERSTAND HOW TO ALT+TAB to switch windows quickly and CTRL+C to kill a script running in terminal. 
+
+SO RUN AT YOUR OWN RISK. If you run this in, say, a gmail tab, it will be clicking/dragging all the things in the world. It might click and send emails, delete things... who knows. 
+
+Eventually I'll add in some additional safeguards like a global timeout (nothing longer than 60 seconds), but that doesn't exist yet. 
+
 ### Step 0:  Install pymouse
 follow instructions and install: 
 [https://github.com/SavinaRoja/PyUserInput](https://github.com/SavinaRoja/PyUserInput)
