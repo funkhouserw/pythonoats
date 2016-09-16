@@ -13,7 +13,8 @@ fs_left_up = (100, 100)
 fs_left_down = (100, 800)
 fs_right_up = (1500, 100)
 fs_right_down = (1500, 800)
-fs_radius = 440
+#fs_radius = 440
+fs_radius = 400
 
 def is_in_circle(coords):
   distance_to_center = math.hypot(coords[0]-fs_center[0],coords[1]-fs_center[1])
@@ -413,7 +414,7 @@ def rotated_building(sx,sy,end,start,decrementi = True, topcount=200):
       rotate_angle = rotate_angle + rotate_by
 
 
-rotated_building(200,200,20,500,False,100)
+rotated_building(250,150,20,500,False,70)
 #multiple_squares()
 
 #building(200,100,100,130)
