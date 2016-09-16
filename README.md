@@ -1,6 +1,49 @@
 # pythonoats
 python mouse-controller for myoats.com 
 
+## Getting Started/ Basics
+
+### Figuring out your screen's coordinates.
+To start out with, we need to determine the coordinate system/etc of your
+screen. Here's how I did it (Ubuntu/Mac. YYMV with Windows.) 
+
+1) Open up a command line (terminal) and type `python` and hit enter.
+This opens up the python interactive console, or REPL.
+
+2) Copy/paste this and hit enter. 
+```
+from pymouse import PyMouse
+m = PyMouse()
+```
+
+3) You can now move your mouse with python! python console, type
+```
+m.move(500,500)
+```
+This should magically move your mouse to the coordinates (500,500) on your
+screen. 
+
+Play around with the coordinates to find the points in this screenshot and
+replace what's already in mousemove_refactor.py (currently lines 11-15)
+![locations](./fs_coordinates.png)
+
+Note that fs_left_up, fs_left_down, fs_right_up, and fs_right_down are slowly
+going to be deprecated. Now that I'm doing everything with respect to the
+center/radius, they aren't necessary. 
+
+### Configured? Let's go! 
+
+To run this, open up a terminal and the full-screen view of myoats.
+When you want to run whatever methods you have, just write
+```
+$ python mousemove_refactor.py
+```
+and hit enter. Your mouse will start drawing all over the place.
+Keep your terminal small and in the corner of the screen. 
+
+![running](./running_example.png)
+
+
 ## This needs a LOT of explaning.
 
 This is a python script that controls your mouse to procedurally generate

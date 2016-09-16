@@ -13,7 +13,10 @@ fs_left_up = (100, 100)
 fs_left_down = (100, 800)
 fs_right_up = (1500, 100)
 fs_right_down = (1500, 800)
+### Actual fs_radius is approx 440 at 100% zoom.
 #fs_radius = 440
+
+### I use this smaller radius for playing around
 fs_radius = 400
 
 def is_in_circle(coords):
