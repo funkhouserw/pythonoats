@@ -17,7 +17,7 @@ fs_right_down = (1500, 800)
 #fs_radius = 440
 
 ### I use this smaller radius for playing around
-fs_radius = 400
+fs_radius = 390
 
 def is_in_circle(coords):
   distance_to_center = math.hypot(coords[0]-fs_center[0],coords[1]-fs_center[1])
@@ -41,9 +41,9 @@ def change_command_to_radius(cmd,coords):
   #change the command to fall within the radius.
   if coords[0] - fs_center[0] == 0:
     if coords[1] - fs_center[1] <= 0:
-      angle = math.radians(90)
-    else:
       angle = math.radians(-90)
+    else:
+      angle = math.radians(90)
   else: 
     angle = math.atan2((coords[1]-fs_center[1]),(coords[0]-fs_center[0]))
   y_shift = fs_radius * math.sin(angle)
@@ -55,8 +55,10 @@ def change_command_to_radius(cmd,coords):
   else:
       return "m.release("+str(x_val)+","+str(y_val)+",1)"
 
-def run_commands(commands,release=True):
-  wait = 0.08
+def run_commands(commands,release=True,reverse=False):
+  wait = 0.02
+  if reverse:
+    commands.reverse()
   if release:
     last_x,last_y = commands[-1][1]
     commands.append(("m.release("+str(last_x)+","+str(last_y)+",1)",(last_x,last_y)))
@@ -74,7 +76,15 @@ def PointsInCircum(r,n=100,xskew=1,yskew=1):
 
 def draw_circle(s_x,s_y,radius,np=50,xskew=1,yskew=1,percent_draw_start=0,percent_draw_end=1):
   all_points = PointsInCircum(radius,n=np,xskew=xskew,yskew=yskew) 
-  points = all_points[int((len(all_points)-1)*percent_draw_start):int((len(all_points)-1)*percent_draw_end)]
+  if percent_draw_start ==0 and percent_draw_end == 1:
+    points = all_points
+  else:
+    if percent_draw_end < percent_draw_start:
+      points = all_points[int((len(all_points)-1)*percent_draw_start):int((len(all_points)-1))]
+      points = points + all_points[0:int((len(all_points)-1)*percent_draw_end)]
+    else:
+      points = all_points[int((len(all_points)-1)*percent_draw_start):int((len(all_points)-1)*percent_draw_end)]
+
   begin_x = s_x + int(points[0][0])
   begin_y = s_y + int(points[0][1])
   commands = [("m.press("+str(begin_x)+","+str(begin_y)+",1)",(begin_x,begin_y))]
@@ -205,7 +215,7 @@ def hemispheres():
       run_commands(commands,True)
 
 
-def triangle_from_points(points):
+def triangle_from_points(points,run=True):
   sx,sy = points[0]
   commands= [("m.press("+str(sx)+","+str(sy)+"),1",(sx,sy))]
   commands.append(("m.press("+str(sx)+","+str(sy)+"),1",(sx,sy)))
@@ -214,7 +224,11 @@ def triangle_from_points(points):
   for (x,y) in points:
     commands.append(("m.press("+str(x)+","+str(y)+"),1",(x,y)))
   cut = True # if random.random() > 0.9 else False
-  run_commands(commands,cut)
+  if run:
+    run_commands(commands,cut)
+  else:
+    return commands
+
 
 def triangle(x,y,side,upsidedown=False):
   sides = side
@@ -394,31 +408,127 @@ def rotated_building(sx,sy,end,start,decrementi = True, topcount=200):
     starting_size = start
     i = starting_size
     vertex = square2_vertex
-    rotate_angle = 0
-    rotate_by = 2
+    rotate_angle = 30
+    rotate_by = 1
     hard_count = 0
     while i > ending_size and hard_count < topcount:
       if decrementi:
         i = i - 1
       hard_count = hard_count + 1 
-      coords = [b for (a,b) in square_slope(vertex[0],vertex[1],i,-1*(starting_size-i)/(3*starting_size))]
+      #coords = [b for (a,b) in square_slope(vertex[0],vertex[1],i,-1*(starting_size-i)/(3*starting_size))]
+      #coords = [b for (a,b) in square_slope(vertex[0],vertex[1],i,0)]
+
+      #  triangle(x,y,side,upsidedown=False):
+      #  triangle_from_points(points,run=True):
+      if hard_count % 5 == 0 and False:
+        coords = [b for (a,b) in triangle_from_points(triangle(vertex[0]+int(i/2),vertex[1],i,False),False)]
+      else:
+        coords = [b for (a,b) in square_slope(vertex[0],vertex[1],i,0)]
       origin = centeroidnp(coords)
       commands = []
       for (x,y) in rotate(coords,origin,rotate_angle):
         commands.append(("m.press("+str(x)+","+str(y)+"),1",(x,y)))
-      run_commands(commands,False)
-      if i%2 == 0:
-        y_c = 4
-        x_c = 5
+      if hard_count%5 == 0 and False:
+        run_commands(commands,True)
       else:
-        y_c = 5
-        x_c = 4
+        run_commands(commands,False)
+
+      if hard_count%2 == 0:
+        y_c = 10
+        x_c = 0
+      else:
+        y_c = 10
+        x_c = 0
+      rotate_angle = rotate_angle - rotate_by
       vertex = (vertex[0]-x_c,vertex[1]-y_c) 
-      rotate_angle = rotate_angle + rotate_by
+      #if hard_count < 2*topcount/3:
+      #  rotate_angle = rotate_angle + rotate_by
+      #else:
+      #  rotate_angle = rotate_angle - rotate_by
 
 
-rotated_building(250,150,20,500,False,70)
+#rotated_building(250,150,20,500,False,70)
+#rotated_building(250,150,20,500,False,40)
+
+#first
+#rotated_building(250,-200,20,200,False,50) #4/6/6/4
+#then....
+#rotated_building(40,-120,20,40,False,20) #3/3/-3/-3
+
 #multiple_squares()
 
 #building(200,100,100,130)
 #building(200-50,100-35,70,100,2)
+
+
+# def draw_circle(s_x,s_y,radius,np=50,xskew=1,yskew=1,percent_draw_start=0,percent_draw_end=1):
+
+def cicle_of_circles():
+  num_pt_outer = 50
+  outer_circle_commands = draw_circle(fs_center[0]+200,fs_center[1]+250,100,np=num_pt_outer,xskew=1,yskew=1)
+  
+  start_rad = 50
+  end_rad = 170
+  increment = (end_rad - start_rad) / num_pt_outer
+  current_rad = start_rad
+  for index,items in enumerate(outer_circle_commands):
+    pts = items[1]
+    commands = draw_circle(pts[0],pts[1],int(current_rad),25)
+    if index < num_pt_outer/2:
+      current_rad = current_rad + increment
+    else:
+      current_rad = current_rad - increment
+    
+    run_commands(commands,False)
+
+
+def circle_of_circles2():
+  num_pt_outer = 90
+  outer_circle_commands = draw_circle(fs_center[0],fs_center[1],200,np=num_pt_outer,xskew=1,yskew=1)
+  start_rad = 300
+  end_rad = 300
+  increment = (end_rad - start_rad) / num_pt_outer
+  current_rad = start_rad
+  for index,items in enumerate(outer_circle_commands):
+    percent_done_we_are = index/num_pt_outer 
+    pts = items[1]
+    if index%2 ==0:
+      commands = draw_circle(pts[0],pts[1],int(current_rad),75,1,1,(0.5+percent_done_we_are)%1,(0.94+percent_done_we_are)%1)
+    else:
+      commands = draw_circle(pts[0],pts[1],int(current_rad),75,1,1,(0.5+percent_done_we_are)%1,(0.94+percent_done_we_are)%1)
+      #commands = draw_circle(pts[0],pts[1],int(current_rad),75,1,1,0.5,0.49)
+    if index < num_pt_outer/2:
+      current_rad = current_rad + increment
+    else:
+      current_rad = current_rad - increment
+    if index%2 ==0: 
+      run_commands(commands,False)
+    else:
+      run_commands(commands,True,True)
+
+def circle_of_circles3():
+  num_pt_outer = 75
+  outer_circle_commands = draw_circle(fs_center[0],fs_center[1],175,np=num_pt_outer,xskew=1,yskew=1)
+  start_rad = 200
+  end_rad = 450
+  increment = (end_rad - start_rad) / num_pt_outer
+  current_rad = start_rad
+  for index,items in enumerate(outer_circle_commands):
+    percent_done_we_are = index/num_pt_outer 
+    pts = items[1]
+    if index%2 ==0:
+      commands = draw_circle(pts[0],pts[1],int(current_rad),75,1,1,(0.5+percent_done_we_are)%1,(0.8+percent_done_we_are)%1)
+    else:
+      commands = draw_circle(pts[0],pts[1],int(current_rad),75,1,1,(0.5+percent_done_we_are)%1,(0.8+percent_done_we_are)%1)
+      #commands = draw_circle(pts[0],pts[1],int(current_rad),75,1,1,0.5,0.49)
+    if index < num_pt_outer/2:
+      current_rad = current_rad + increment
+    else:
+      current_rad = current_rad - increment
+    if index%2 ==0: 
+      run_commands(commands,False)
+    else:
+      run_commands(commands,True,True)
+
+
+circle_of_circles3()
